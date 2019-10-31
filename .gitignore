@@ -1,0 +1,12 @@
+*.pyc
+*cache
+*.idea
+*.log
+*logs/
+logs/
+runs/
+*__pycache__
+.DS_Store
+venv_action_grammar
+venv_action_grammar/
+
