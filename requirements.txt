@@ -26,4 +26,4 @@ scikit_learn==0.21.2
 tf2onnx==1.5.1
 oauth2client
 xxhash
-stable_baselines
+stable_baselines==2.7.0

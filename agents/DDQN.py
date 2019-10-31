@@ -31,9 +31,9 @@ class DDQN(Base_Agent):
         while not self.done:
             self.action = self.pick_action()
             self.conduct_action(self.action)
-            # if self.time_for_q_network_to_learn() and not eval_ep:
-            #     for _ in range(self.hyperparameters["learning_iterations"]):
-            #         self.learn()
+            if self.time_for_q_network_to_learn() and not eval_ep:
+                for _ in range(self.hyperparameters["learning_iterations"]):
+                    self.learn()
             if not eval_ep or save_experience_override: self.save_experience()
             self.state = self.next_state #this is to set the state for the next iteration
             if not eval_ep: self.global_step_number += 1
@@ -60,18 +60,15 @@ class DDQN(Base_Agent):
         """Uses the local Q network and an epsilon greedy policy to pick an action"""
         # PyTorch only accepts mini-batches and not single observations so we have to use unsqueeze to add
         # a "fake" dimension to make it a mini-batch rather than a single observation
-
-        return self.environment.action_space.sample()
-
-        # if state is None: state = self.state
-        # epsilon = self.get_updated_epsilon_exploration()
-        # if random.random() < epsilon: return self.environment.action_space.sample()
-        # self.q_network_local.eval() #puts network in evaluation mode
-        # with torch.no_grad():
-        #     action_values = self.calculate_q_value(state, local=True)
-        # self.q_network_local.train() #puts network back in training mode
-        # action = torch.argmax(action_values, dim=1).item()
-        # return action
+        if state is None: state = self.state
+        epsilon = self.get_updated_epsilon_exploration()
+        if random.random() < epsilon: return self.environment.action_space.sample()
+        self.q_network_local.eval() #puts network in evaluation mode
+        with torch.no_grad():
+            action_values = self.calculate_q_value(state, local=True)
+        self.q_network_local.train() #puts network back in training mode
+        action = torch.argmax(action_values, dim=1).item()
+        return action
 
     def get_updated_epsilon_exploration(self):
         """Gets the probability that we just pick a random action. This probability decays the more episodes we have seen"""
